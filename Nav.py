@@ -39,7 +39,7 @@ class Nav:
 
     def navToGoal(self):
         # Get init reading to calc theta
-        getCurrentPos()
+        self.getCurrentPos()
         setTime = time() + self.INIT_TIME
         while(1):
             if time() < setTime:
@@ -47,7 +47,7 @@ class Nav:
             else:
                 self.DRIVE.forward(0)
                 break
-        getCurrentPos()
+        self.getCurrentPos()
         goal_vec = self.GOAL_POS - (self.CURRENT_POS - self.LAST_POS)
         setTime = time() + self.TURN_TIME
         while(1):
