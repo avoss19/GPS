@@ -1,5 +1,6 @@
 from bsmLib import RPL
 from bsmLib import tcpServer
+RPL.init()
 
 class Drive:
     def __init__(self, l = [0], r = [1]):
@@ -19,7 +20,7 @@ class Drive:
         self.MIN_SPEED = 1000
 
         # Difference in speed devided by 2 & Middle speed (stopped due to midpoint)
-        self._DIF_SPEED_ = int(self.MAX_SPEED - self.MIN_SPEED) / 2)
+        self._DIF_SPEED = int((self.MAX_SPEED - self.MIN_SPEED) / 2)
         self.MID_SPEED = self.MIN_SPEED + self._DIF_SPEED
 
     def _convertSpeed(self, speed):
@@ -98,41 +99,29 @@ class DriveServer(Drive):
     def drive(self, l_speed, r_speed):
         self.NETWORK.send(str(_convertSpeed(l_speed * self.L_DIR)) + ':' + str(_convertSpeed(r_speed * self.R_DIR)))
 
-class DriverClient(Drive):
+class DriveClient(Drive):
     def __init__(self, l = [0], r = [1], ip="0.0.0.0", port=10000):
         # Setup network
         self.NETWORK = tcpClient(ip, port)
         self.NETWORK.connect()
 
         # Init Vars
-        self._init(l, r)
+        self._initVar(l, r)
 
     def drive(self):
-        m = self.recv()
+        m = self.NETWORK.recv()
         m = m.split(':')
         for i in self.L:
             RPL.servoWrite(i, _convertSpeed(m[0] * self.L_DIR))
         for i in self.R:
             RPL.servoWrite(i, _convertSpeed(m[1] * self.R_DIR))
 
-class DriverClientPWM(Drive):
+class DriveClientPWM(DriveClient):
     def __init__(self, l = [0], r = [1], freq = 3000, ip="0.0.0.0", port=10000):
-        # Setup network
-        self.NETWORK = tcpClient(ip, port)
-        self.NETWORK.connect()
-
-        # Init Vars
-        self._init(l, r)
-
-        # PWM frequency
-        self.FREQ = freq
-
-        # Set pin modes
-        for i in self.L + self.R:
-            RPL.pinMode(i, RPL.PWM)
+        super().__init__(self, l, r, ip, port)
 
     def drive(self):
-        m = self.recv()
+        m = self.NETWORK.recv()
         m = m.split(':')
         for i in self.L:
             RPL.pwmWrite(0, _convertSpeed(m[0] * self.L_DIR), self.FREQ)

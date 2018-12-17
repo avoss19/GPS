@@ -4,7 +4,6 @@ from bsmLib import vector
 from GPS import GPS
 from Drive import Drive
 from Drive import DrivePWM
-RPL.init()
 
 class Nav:
     def __init__(self, drive=Drive(), gps="/dev/serial0", init_time = 10):
@@ -18,11 +17,11 @@ class Nav:
 
     def setGoalVec(self, goal):
         # Set goal w/ vec
-        self.GOAL = goal
+        self.GOAL_POS = goal
 
     def setGoal(self, x, y):
         # Set goal w/ x, y
-        self.GOAL.set(x, y)
+        self.GOAL_POS.set(x, y)
 
     def setTurnTime(self, sec):
         # Set turn time
